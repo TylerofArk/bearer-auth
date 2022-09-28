@@ -7,7 +7,7 @@ async function handleSignup(req, res, next) {
     let userRecord = await users.create(req.body);
     const output = {
       user: userRecord,
-      token: userRecord.token
+      token: userRecord.token,
     };
     res.status(200).json(output);
   } catch (e) {
@@ -20,7 +20,7 @@ async function handleSignin(req, res, next) {
   try {
     const user = {
       user: request.user,
-      token: request.user.token
+      token: request.user.token,
     };
     res.status(200).json(user);
   } catch (e) {
@@ -48,5 +48,5 @@ module.exports = {
   handleSignup,
   handleSignin,
   handleGetUsers,
-  handleSecret
-}
+  handleSecret,
+};
