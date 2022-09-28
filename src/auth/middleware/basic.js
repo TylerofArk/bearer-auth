@@ -5,7 +5,9 @@ const { user } = require('../models/index.js');
 
 module.exports = async (req, res, next) => {
 
-  if (!req.headers.authorization) { return _authError(); }
+  if (!req.headers.authorization) {
+    next('invalid login');
+  }
 
   let basic = req.headers.authorization;
   let [username, pass] = base64.decode(basic).split(':');
