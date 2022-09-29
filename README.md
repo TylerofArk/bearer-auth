@@ -1,118 +1,74 @@
-# Bearer Authorization
+# Project: Basic Auth
 
-Using a "Bearer Token" to re-authenticate with a server following a successful login, or obtaining/generating a permanent key
+## Author: Tyler Main
 
-## Learning Objectives
+### Code 401d48 Lab 06
 
-### Students will be able to
+### Problem Domain
 
-#### Describe and Define
+Deploy an Express server that implements Basic Authentication, with signup and signin capabilities, using a Postgres database for storage.
 
-- Bearer Authentication
-- JSON Web Tokens (jwt)
-- Web Security
-- When to use Basic or Bearer Authentication
+### Setup
 
-#### Execute
+### Running the application locally
 
-- Create a Bearer Token Auth System
-- Secure tokens
+- Clone the repository to your local machine, then run the following commands in your terminal -
 
-## Today's Outline
+  npm install
+  touch .env
 
-<!-- To Be Completed By Instructor -->
+- Add the following lines to the newly created .env file.
 
-## Notes
+PORT=<port number>
 
-### Bearer Tokens
+- Run the following command -
 
-- Bearer Tokens are sent to the user/client after the initial `signin` process has completed.
-- Clients must make every subsequent request to the server with that token, in the header.
-  - `Authorization: Bearer encoded.jsonwebtoken.here`
-- The server opens the token, does the re-authentication, and then grants or denies access.
-- In express servers, this can be done in middleware, in conjunction with a user model.
+  npm start
 
-  ```javascript
-  app.get('/somethingsecret', bearerToken, (req,res) => {
-    res.status(200).send('secret sauce');
-  });
+- You can now access the application in your browser by navigating to https://localhost:PORT, with PORT being the port number that you specified in the .env.
 
-  function bearerToken( req, res, next ) {
-    let token = req.headers.authorization.split(' ').pop();
-    try {
-      if ( tokenIsValid(token) ) { next(); }
-    }
-    catch(e) { next("Invalid Token"); }
+#### Endpoints
+
+##### Endpoint: /
+
+Response: The server works!
+
+##### Endpoint: /bad
+
+Returns JSON Object
+  {
+    "error": 500,
+    "route": "/bad",
+    "query": {},
+    "message": "Bad endpoint"
   }
 
-  function tokenIsValid(token) {
-    let parsedToken = jwt.verify(token, SECRETKEY);
-    return Users.find(parsedToken.id);
-  }
-  ```
+#### Tests
 
-### Sequelize Virtual Properties
+- Unit Tests: npm run test
 
-Sequelize allows "Virtual" fields on our data model. A virtual field is a property of your data model that:
+#### Include testing to assert the following
 
-1. Is defined by you, using a function.
-2. Added to your data model every time a record is fetched from the database (automatically).
-3. Exists only in memory as you access your record.
-4. Therefore ... virtual fields are never saved to the database.
+- 404 on a bad route
 
-For example, here's a simple data model that describes a piece of food:
+- 404 on a bad method
 
-```javascript
-const food = sequelize.define('Food', {
-  name: {type: DataTypes.STRING, required:true },
-  calories: {type: DataTypes.INTEGER, required:true },
-  type: {type: DataTypes.ENUM(["vegetable", "carb", "protien"]) },
-});
-```
+- creates a user with POST
 
-Assume you have an instance, such as a piece of bread:
+### Dependencies
 
-```json
-{
-  "name": "Wonder Bread",
-  "calories": 100,
-  "type": "carb"
-}
-```
+- base-64
+- bcrypt
+- node
+- dotenv
+- express
+- jest
+- supertest
+- sequelize
+- sequelize-cli
+- pg
+- sqlite3
 
-In practice, you might want to calculate some value on each food item, based on it's properties. This is a value that has merit in the real world, but isn't something you need to store in the database. In fact, the user entering the data wouldn't actually know how to calculate this anyway.
+### UML
 
-For our example, let's add a new virtual field called "points" which is an arbitrary figure that'll tell you how healthy something is.
-
-Add this to your Sequelize food schema
-
-```javascript
-const food = sequelize.define('Food', {
-  name: {type: DataTypes.STRING, required:true },
-  calories: {type: DataTypes.INTEGER, required:true },
-  type: {type: DataTypes.ENUM(["vegetable", "carb", "protien"]) },
-  points: { // our virtual field needs a function called a `getter` which runs and uses it's return value.
-    type: DataTypes.VIRTUAL,
-    get() {
-      let points = this.calories;
-      if ( type === "carb" ) { points = this.calories * 10; }
-      else if ( type === "protien" ) { points = this.calories * .5; }
-      else if ( type === "vegetable" ) { points = this.calories * .2; }
-      return points;
-    }
-  }
-});
-```
-
-Now, anytime you get a record from Sequelize, using `.find()`, `findOne()`, `findOneById()`, etc, the data that you can see on your record would be this:
-
-```json
-{
-  "name": "Wonder Bread",
-  "calories": 100,
-  "type": "carb"
-  "points": 1000
-}
-```
-
-If you were to save that record, points would not be stored, it's a calculated value, but you can use this feature of Sequelize to create data fields on the fly that can help you to keep information accessible to your code, while not having to persist it.
+![Lab 7 UML](./imgs/Lab07UML.png)
