@@ -9,7 +9,7 @@ require('dotenv').config();
 // Esoteric Resources
 const errorHandler = require('./error-handlers/500.js');
 const notFound = require('./error-handlers/404.js');
-const authRoutes = require('./auth/router/index.js');
+const authRouter = require('./auth/router/index.js');
 
 // Prepare the express app
 const app = express();
@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use(authRoutes);
+app.use(authRouter);
 
 // Catchalls
 app.use(notFound);
