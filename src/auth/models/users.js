@@ -12,7 +12,7 @@ const userSchema = (sequelize, DataTypes) => {
     token: {
       type: DataTypes.VIRTUAL,
       get() {
-        return jwt.sign({ username: this.username }, SECRET, {expiresIn: 4800000});
+        return jwt.sign({ username: this.username }, SECRET, {expiresIn: 900000});
       },
       set(payload){ // a method that runs when set with "="
         return jwt.sign(payload, SECRET);
@@ -27,17 +27,17 @@ const userSchema = (sequelize, DataTypes) => {
 
   // Basic AUTH: Validating strings (username, password)
   model.authenticateBasic = async function (username, password) {
-    const user = await this.findOne({ username });
+    const user = await this.findOne({where: {username} });
     const valid = await bcrypt.compare(password, user.password);
     if (valid) { return user; }
     throw new Error('Invalid User');
   };
 
   // Bearer AUTH: Validating a token
-  model.authenticateBearer = async function (token) {
+  model.authenticateWithToken = async function (token) {
     try {
-      let payload = jwt.verify(token, process.env.SECRET);
-      const user = await this.findOne({ username: payload.username });
+      let parsedToken = jwt.verify(token, SECRET);
+      const user = await this.findOne({where: { username: parsedToken.username }});
       if (user) { return user; }
       throw new Error('User Not Found');
     } catch (e) {
